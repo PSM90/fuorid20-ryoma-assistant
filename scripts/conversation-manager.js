@@ -3,23 +3,39 @@
  * Conversation Memory Manager
  */
 
-import { MODULE_ID, getSetting, setSetting } from './config.js';
+import { MODULE_ID } from './config.js';
 
 /**
- * Manages conversation history persistence
+ * Manages conversation history persistence using module settings
+ * (Compatible with Foundry VTT v13 and The Forge)
  */
 export class ConversationManager {
-    static FLAG_KEY = 'conversationHistory';
+    static SETTING_KEY = 'conversationHistory';
     static MAX_HISTORY = 100; // Maximum messages to keep
 
     /**
-     * Get all conversation history from the World
+     * Register the conversation history setting
+     * Called from config.js during module init
+     */
+    static registerSetting() {
+        game.settings.register(MODULE_ID, this.SETTING_KEY, {
+            name: 'Conversation History',
+            hint: 'Stored conversation history with Ryoma',
+            scope: 'world',
+            config: false,
+            type: Array,
+            default: [],
+            requiresReload: false
+        });
+    }
+
+    /**
+     * Get all conversation history
      * @returns {Promise<Array>} Array of conversation messages
      */
     static async getHistory() {
         try {
-            // Get from world flags (The Forge compatible)
-            const history = game.world.getFlag(MODULE_ID, this.FLAG_KEY) || [];
+            const history = game.settings.get(MODULE_ID, this.SETTING_KEY) || [];
             return history;
         } catch (error) {
             console.error(`${MODULE_ID} | Error loading conversation history:`, error);
@@ -59,8 +75,8 @@ export class ConversationManager {
                 history.shift();
             }
 
-            // Save to world flags
-            await game.world.setFlag(MODULE_ID, this.FLAG_KEY, history);
+            // Save to settings
+            await game.settings.set(MODULE_ID, this.SETTING_KEY, history);
 
             return message;
         } catch (error) {
@@ -119,7 +135,7 @@ export class ConversationManager {
      */
     static async clearHistory() {
         try {
-            await game.world.unsetFlag(MODULE_ID, this.FLAG_KEY);
+            await game.settings.set(MODULE_ID, this.SETTING_KEY, []);
             console.log(`${MODULE_ID} | Conversation history cleared`);
         } catch (error) {
             console.error(`${MODULE_ID} | Error clearing history:`, error);
@@ -202,7 +218,7 @@ export class ConversationManager {
                 }
             }
 
-            await game.world.setFlag(MODULE_ID, this.FLAG_KEY, imported);
+            await game.settings.set(MODULE_ID, this.SETTING_KEY, imported);
             console.log(`${MODULE_ID} | Imported ${imported.length} messages`);
         } catch (error) {
             console.error(`${MODULE_ID} | Error importing history:`, error);

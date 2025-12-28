@@ -85,6 +85,17 @@ export const CHAT_PREFIX = '!R';
  * Register all module settings
  */
 export function registerSettings() {
+  // Conversation history storage
+  game.settings.register(MODULE_ID, 'conversationHistory', {
+    name: 'Conversation History',
+    hint: 'Stored conversation history with Ryoma',
+    scope: 'world',
+    config: false,
+    type: Array,
+    default: [],
+    requiresReload: false
+  });
+
   // API Key (password field)
   game.settings.register(MODULE_ID, 'apiKey', {
     name: game.i18n.localize('RYOMA.Settings.ApiKey.Name'),
