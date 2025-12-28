@@ -406,6 +406,46 @@ export class CompendiumBrowser {
     }
 
     /**
+     * Find an item in compendiums by name
+     * @param {string} name - Item name to search for
+     * @param {string} category - Optional category to search in (spells, items, features, etc.)
+     * @returns {Promise<Object|null>} Found item UUID and data, or null
+     */
+    static async findItemByName(name, category = null) {
+        const nameLower = name.toLowerCase().trim();
+
+        // Determine which categories to search
+        const categoriesToSearch = category
+            ? [category]
+            : ['spells', 'items', 'features', 'classes', 'subclasses', 'races'];
+
+        for (const cat of categoriesToSearch) {
+            const packIds = this.getCompendiumsForCategory(cat);
+
+            for (const packId of packIds) {
+                const pack = game.packs.get(packId);
+                if (!pack) continue;
+
+                const index = await pack.getIndex();
+
+                for (const entry of index) {
+                    // Exact match (case insensitive)
+                    if (entry.name.toLowerCase() === nameLower) {
+                        return {
+                            uuid: `Compendium.${packId}.Item.${entry._id}`,
+                            name: entry.name,
+                            type: entry.type,
+                            pack: pack.metadata.label
+                        };
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Import an item from compendium to an actor
      * @param {string} itemUuid - Compendium item UUID
      * @param {Actor} targetActor - Target actor

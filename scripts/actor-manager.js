@@ -201,10 +201,29 @@ export class ActorManager {
         const itemsToCreate = [];
 
         for (const itemData of items) {
-            if (itemData.fromCompendium) {
-                // Import from compendium
+            if (itemData.fromCompendium === true || typeof itemData.fromCompendium === 'string') {
+                // Import from compendium - search by name
                 try {
-                    await CompendiumBrowser.importToActor(itemData.fromCompendium, actor);
+                    let uuid = typeof itemData.fromCompendium === 'string'
+                        ? itemData.fromCompendium
+                        : null;
+
+                    // If fromCompendium is just true, search by name
+                    if (!uuid) {
+                        const found = await CompendiumBrowser.findItemByName(itemData.name, itemData.type === 'spell' ? 'spells' : null);
+                        if (found) {
+                            uuid = found.uuid;
+                            console.log(`${MODULE_ID} | Found "${itemData.name}" in compendium: ${found.pack}`);
+                        }
+                    }
+
+                    if (uuid) {
+                        await CompendiumBrowser.importToActor(uuid, actor);
+                        console.log(`${MODULE_ID} | Imported "${itemData.name}" from compendium to ${actor.name}`);
+                    } else {
+                        console.warn(`${MODULE_ID} | Could not find "${itemData.name}" in compendiums, creating custom item`);
+                        itemsToCreate.push(this.buildItemData(itemData));
+                    }
                 } catch (error) {
                     console.warn(`${MODULE_ID} | Could not import ${itemData.name} from compendium:`, error);
                     // Create custom if compendium import fails

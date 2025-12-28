@@ -63,11 +63,16 @@ STRUTTURA DATI PER ACTOR (NPC/Mostro):
     "senses": {"darkvision": 60},
     "biography": "Descrizione...",
     "items": [
-      {"type": "weapon", "name": "Scimitar", "custom": {"damage": "1d6", "damageType": "slashing"}},
-      {"type": "weapon", "name": "Shortbow", "custom": {"damage": "1d6", "damageType": "piercing", "range": "80/320"}}
+      {"type": "spell", "name": "Misty Step", "fromCompendium": true},
+      {"type": "spell", "name": "Testfuoco", "custom": {"level": 1, "damage": "100d8", "damageType": "fire", "description": "Un incantesimo devastante di fuoco."}}
     ]
   }
 }
+
+IMPORTANTE PER GLI ITEMS:
+- Se l'item esiste nei compendi (es: "Misty Step", "Fireball", "Longsword"), usa: {"type": "spell", "name": "Misty Step", "fromCompendium": true}
+- Se l'item è CUSTOM/inventato (es: "Testfuoco"), usa: {"type": "spell", "name": "Testfuoco", "custom": {...dati...}}
+- USA SEMPRE IL NOME INGLESE ORIGINALE per gli item dai compendi (es: "Misty Step" non "Passo velato")
 
 STRUTTURA DATI PER ITEM:
 {
