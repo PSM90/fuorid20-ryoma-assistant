@@ -447,7 +447,7 @@ export class ChatHandler {
         const html = `
       <div class="rioma-chat-message">
         <div class="rioma-header">
-          <div class="rioma-avatar">🐺</div>
+          <div class="rioma-avatar"><img src="modules/fuorid20-ryoma-assistant/ryoma_avatar.jpg" alt="Ryoma"></div>
           <span class="ryoma-name">Ryoma</span>
           ${modelInfo}
         </div>
@@ -478,7 +478,7 @@ export class ChatHandler {
         const html = `
       <div class="rioma-chat-message rioma-error">
         <div class="rioma-header">
-          <div class="rioma-avatar">🐺</div>
+          <div class="rioma-avatar"><img src="modules/fuorid20-ryoma-assistant/ryoma_avatar.jpg" alt="Ryoma"></div>
           <span class="ryoma-name">Ryoma</span>
         </div>
         <div class="rioma-content">
@@ -517,7 +517,7 @@ export class ChatHandler {
         const html = `
       <div class="rioma-chat-message" id="rioma-thinking">
         <div class="rioma-header">
-          <div class="rioma-avatar">🐺</div>
+          <div class="rioma-avatar"><img src="modules/fuorid20-ryoma-assistant/ryoma_avatar.jpg" alt="Ryoma"></div>
           <span class="ryoma-name">Ryoma</span>
         </div>
         <div class="rioma-thinking">
