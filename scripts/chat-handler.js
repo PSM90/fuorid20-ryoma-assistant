@@ -45,6 +45,19 @@ export class ChatHandler {
         // Extract the actual message
         const message = trimmed.substring(CHAT_PREFIX.length).trim();
 
+        // Check for confirmation commands first
+        if (this.pendingConfirmation) {
+            const lower = message.toLowerCase();
+            if (lower === 'conferma' || lower === 'sì' || lower === 'si' || lower === 'ok') {
+                this.handleConfirmation(true);
+                return false;
+            }
+            if (lower === 'annulla' || lower === 'no' || lower === 'cancella') {
+                this.handleConfirmation(false);
+                return false;
+            }
+        }
+
         // Process asynchronously
         this.processMessage(message).catch(error => {
             console.error(`${MODULE_ID} | Error processing message:`, error);
@@ -106,7 +119,7 @@ export class ChatHandler {
             this.removeThinking(thinkingMsgId);
 
             // Handle response
-            await this.handleResponse(response, message, context);
+            await this.handleResponse(response, message);
 
         } catch (error) {
             console.error(`${MODULE_ID} | Error:`, error);
@@ -152,12 +165,30 @@ export class ChatHandler {
      * Handle LLM response
      * @param {Object} response - Parsed LLM response
      * @param {string} originalMessage - Original user message
-     * @param {Object} context - Context used
      */
-    static async handleResponse(response, originalMessage, context) {
-        // Check for tool calls that need execution
-        if (response.toolCalls && response.toolCalls.length > 0) {
-            await this.handleToolCalls(response, originalMessage, context);
+    static async handleResponse(response, originalMessage) {
+        // Check for creation data
+        if (response.creationData) {
+            // Store pending confirmation
+            this.pendingConfirmation = {
+                type: response.creationData.action,
+                data: response.creationData.data,
+                originalMessage
+            };
+
+            // Show the response with confirmation prompt
+            let content = response.content;
+            content += `\n\n*Rispondi con \`!R conferma\` per procedere o \`!R annulla\` per annullare.*`;
+
+            await this.sendAssistantMessage(content, {
+                model: response.modelDisplayName,
+                hasConfirmation: true
+            });
+
+            await ConversationManager.saveAssistantMessage(response.content, {
+                model: response.modelUsed,
+                pendingAction: response.creationData.action
+            });
         } else {
             // Regular text response
             await this.sendAssistantMessage(response.content, {
@@ -169,192 +200,6 @@ export class ChatHandler {
                 model: response.modelUsed
             });
         }
-    }
-
-    /**
-     * Handle tool calls from LLM
-     * @param {Object} response - LLM response with tool calls
-     * @param {string} originalMessage - Original user message  
-     * @param {Object} context - Context used
-     */
-    static async handleToolCalls(response, originalMessage, context) {
-        const toolResults = [];
-        let requiresConfirmation = false;
-        let confirmationData = null;
-
-        for (const toolCall of response.toolCalls) {
-            switch (toolCall.name) {
-                case 'search_compendium': {
-                    const searchResult = await CompendiumBrowser.search(
-                        toolCall.arguments.category,
-                        toolCall.arguments.query,
-                        toolCall.arguments.limit || 10
-                    );
-                    toolResults.push({
-                        callId: toolCall.id,
-                        result: searchResult
-                    });
-                    break;
-                }
-
-                case 'get_party_info': {
-                    const partyInfo = await PartyAnalyzer.analyzeParty();
-                    toolResults.push({
-                        callId: toolCall.id,
-                        result: partyInfo
-                    });
-                    break;
-                }
-
-                case 'get_actor_info': {
-                    const actorInfo = await ActorManager.getActorInfo(
-                        toolCall.arguments.uuid ||
-                        ActorManager.findActorByName(toolCall.arguments.name)?.uuid
-                    );
-                    toolResults.push({
-                        callId: toolCall.id,
-                        result: actorInfo
-                    });
-                    break;
-                }
-
-                case 'create_actor': {
-                    requiresConfirmation = true;
-                    confirmationData = {
-                        type: 'create_actor',
-                        data: toolCall.arguments,
-                        recap: ActorManager.buildCreationRecap(toolCall.arguments),
-                        toolCallId: toolCall.id
-                    };
-                    break;
-                }
-
-                case 'modify_actor': {
-                    requiresConfirmation = true;
-                    confirmationData = {
-                        type: 'modify_actor',
-                        data: toolCall.arguments,
-                        toolCallId: toolCall.id
-                    };
-                    break;
-                }
-
-                case 'create_item': {
-                    requiresConfirmation = true;
-                    confirmationData = {
-                        type: 'create_item',
-                        data: toolCall.arguments,
-                        recap: ItemManager.buildCreationRecap(toolCall.arguments),
-                        toolCallId: toolCall.id
-                    };
-                    break;
-                }
-            }
-        }
-
-        // If we have tool results (searches, info), continue the conversation
-        if (toolResults.length > 0 && !requiresConfirmation) {
-            // Build messages for continuation
-            const messages = [
-                { role: 'system', content: LLMClient.buildSystemPrompt(context) },
-                ...context.history,
-                { role: 'user', content: originalMessage },
-                { role: 'assistant', content: response.content, tool_calls: response.toolCalls }
-            ];
-
-            const continuation = await LLMClient.continueWithToolResults(messages, toolResults, context);
-
-            await this.sendAssistantMessage(continuation.content, {
-                model: continuation.modelDisplayName
-            });
-
-            await ConversationManager.saveAssistantMessage(continuation.content, {
-                model: continuation.modelUsed
-            });
-        }
-
-        // If confirmation is required, show the confirmation dialog
-        if (requiresConfirmation) {
-            // First show the recap message
-            const recapMessage = this.buildRecapMessage(confirmationData);
-            await this.sendAssistantMessage(recapMessage, {
-                model: response.modelDisplayName,
-                showConfirmation: true,
-                confirmationData: confirmationData
-            });
-
-            // Store pending confirmation
-            this.pendingConfirmation = {
-                ...confirmationData,
-                originalMessage,
-                context,
-                response
-            };
-        }
-    }
-
-    /**
-     * Build recap message for confirmation
-     * @param {Object} confirmationData - Confirmation data
-     * @returns {string} Recap message
-     */
-    static buildRecapMessage(confirmationData) {
-        const { type, data, recap } = confirmationData;
-
-        let message = '';
-
-        if (type === 'create_actor') {
-            message = `🐺 **Posso creare questo Actor per te:**\n\n`;
-            message += `**Nome:** ${data.name}\n`;
-            message += `**Tipo:** ${data.type === 'npc' ? 'NPC' : 'Personaggio'}\n`;
-
-            if (data.cr !== undefined) message += `**GS:** ${data.cr}\n`;
-            if (data.hp) message += `**HP:** ${data.hp.max || data.hp.value}\n`;
-            if (data.ac) message += `**CA:** ${data.ac.value || data.ac}\n`;
-
-            if (data.abilities) {
-                const abStr = Object.entries(data.abilities)
-                    .map(([k, v]) => `${k.toUpperCase()}: ${typeof v === 'object' ? v.value : v}`)
-                    .join(', ');
-                message += `**Caratteristiche:** ${abStr}\n`;
-            }
-
-            if (data.items && data.items.length > 0) {
-                message += `\n**Items:**\n`;
-                for (const item of data.items) {
-                    const source = item.fromCompendium ? '📚 (compendio)' : '✨ (creato)';
-                    message += `- ${item.name} ${source}\n`;
-                }
-            }
-
-            if (data.biography) {
-                message += `\n**Background:** ${data.biography.substring(0, 200)}${data.biography.length > 200 ? '...' : ''}\n`;
-            }
-
-        } else if (type === 'create_item') {
-            message = `🐺 **Posso creare questo oggetto per te:**\n\n`;
-            message += `**Nome:** ${data.name}\n`;
-            message += `**Tipo:** ${data.type}\n`;
-
-            if (recap.details) {
-                for (const detail of recap.details) {
-                    message += `**${detail.label}:** ${detail.value}\n`;
-                }
-            }
-
-        } else if (type === 'modify_actor') {
-            message = `🐺 **Posso applicare queste modifiche:**\n\n`;
-            message += `**Actor:** ${data.uuid}\n`;
-            message += `**Modifiche:**\n`;
-
-            for (const [key, value] of Object.entries(data.changes)) {
-                message += `- ${key}: ${JSON.stringify(value)}\n`;
-            }
-        }
-
-        message += `\n*Vuoi procedere? Rispondi con "!R conferma" o "!R annulla"*`;
-
-        return message;
     }
 
     /**
@@ -405,6 +250,9 @@ export class ChatHandler {
                         successMessage = `✅ Ho creato l'oggetto **${result.name}**! Puoi trovarlo nella lista degli Items.`;
                     }
                     break;
+
+                default:
+                    throw new Error(`Azione non riconosciuta: ${pending.type}`);
             }
 
             await this.sendAssistantMessage(successMessage);
@@ -418,6 +266,7 @@ export class ChatHandler {
             });
 
         } catch (error) {
+            console.error(`${MODULE_ID} | Creation error:`, error);
             this.sendErrorMessage(`Errore durante la creazione: ${error.message}`);
         }
     }
@@ -572,25 +421,6 @@ export class ChatHandler {
             .replace(/\n/g, '<br>');
 
         return formatted;
-    }
-
-    /**
-     * Check if message is a confirmation response
-     * @param {string} message - Message to check
-     * @returns {Object|null} Confirmation info or null
-     */
-    static checkConfirmation(message) {
-        const lower = message.toLowerCase().trim();
-
-        if (lower === 'conferma' || lower === 'sì' || lower === 'si' || lower === 'ok' || lower === 'procedi') {
-            return { confirmed: true };
-        }
-
-        if (lower === 'annulla' || lower === 'no' || lower === 'stop' || lower === 'cancella') {
-            return { confirmed: false };
-        }
-
-        return null;
     }
 }
 

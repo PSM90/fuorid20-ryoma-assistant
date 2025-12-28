@@ -31,16 +31,60 @@ CAPACITÀ:
 - Puoi creare e modificare Actors (PG, NPC, Mostri)
 - Puoi creare e modificare Items (Oggetti, Armi, Incantesimi, Abilità)
 
-QUANDO TI VIENE CHIESTO DI CREARE O MODIFICARE QUALCOSA:
-1. Prima fai un RECAP dettagliato di cosa intendi creare/modificare
-2. Descrivi: Nome, Tipo, Statistiche principali, Items/Abilità che includerai
-3. Specifica se userai elementi dai compendi (citando il nome originale) o se li creerai da zero
-4. Chiedi conferma prima di procedere con la creazione
+QUANDO TI VIENE CHIESTO DI CREARE QUALCOSA:
+Devi rispondere con un blocco JSON speciale nel formato seguente (IMPORTANTE: includi i marcatori esattamente come mostrato):
+
+---RYOMA_CREATE_START---
+{
+  "action": "create_actor" oppure "create_item",
+  "data": {
+    // tutti i dati necessari per la creazione
+  }
+}
+---RYOMA_CREATE_END---
+
+Prima del blocco JSON, scrivi sempre un recap testuale in italiano di cosa stai per creare.
+Dopo il blocco JSON, chiedi conferma al Master.
+
+STRUTTURA DATI PER ACTOR (NPC/Mostro):
+{
+  "action": "create_actor",
+  "data": {
+    "name": "Nome",
+    "type": "npc",
+    "cr": 0.25,
+    "size": "sm",
+    "creatureType": "humanoid",
+    "abilities": {"str": 8, "dex": 14, "con": 10, "int": 10, "wis": 8, "cha": 8},
+    "hp": {"value": 7, "max": 7, "formula": "2d6"},
+    "ac": {"value": 15},
+    "speed": {"walk": 30},
+    "languages": ["Common", "Goblin"],
+    "senses": {"darkvision": 60},
+    "biography": "Descrizione...",
+    "items": [
+      {"type": "weapon", "name": "Scimitar", "custom": {"damage": "1d6", "damageType": "slashing"}},
+      {"type": "weapon", "name": "Shortbow", "custom": {"damage": "1d6", "damageType": "piercing", "range": "80/320"}}
+    ]
+  }
+}
+
+STRUTTURA DATI PER ITEM:
+{
+  "action": "create_item",
+  "data": {
+    "name": "Nome Item",
+    "type": "weapon",
+    "description": "Descrizione...",
+    "damage": "1d8",
+    "damageType": "slashing"
+  }
+}
 
 QUANDO DAI SOLO SUGGERIMENTI (senza creare):
-- Elenca le opzioni disponibili nei compendi
+- Elenca le opzioni disponibili
 - Spiega perché sono adatte al contesto
-- Non chiedere conferma, sono solo suggerimenti informativi`;
+- Non usare il formato JSON speciale`;
 
         // Add party context
         if (context.party && context.party.length > 0) {
@@ -60,245 +104,13 @@ QUANDO DAI SOLO SUGGERIMENTI (senza creare):
                     prompt += `\n- ${category}: ${packs.join(', ')}`;
                 }
             }
-            prompt += `\n\nQuando suggerisci contenuti, cerca prima in questi compendi.`;
         }
 
         return prompt;
     }
 
     /**
-     * Build the tools definition for function calling
-     * @returns {Array} Tools array for OpenRouter API
-     */
-    static buildTools() {
-        return [
-            {
-                type: 'function',
-                function: {
-                    name: 'search_compendium',
-                    description: 'Cerca contenuti nei compendi configurati per una specifica categoria',
-                    parameters: {
-                        type: 'object',
-                        properties: {
-                            category: {
-                                type: 'string',
-                                enum: ['classes', 'subclasses', 'features', 'spells', 'items', 'actors', 'races', 'proficiencies'],
-                                description: 'Categoria di compendio in cui cercare'
-                            },
-                            query: {
-                                type: 'string',
-                                description: 'Termine di ricerca (nome o parte del nome)'
-                            },
-                            limit: {
-                                type: 'number',
-                                description: 'Numero massimo di risultati (default: 10)'
-                            }
-                        },
-                        required: ['category', 'query']
-                    }
-                }
-            },
-            {
-                type: 'function',
-                function: {
-                    name: 'create_actor',
-                    description: 'Crea un nuovo Actor (NPC o Mostro) con le statistiche specificate',
-                    parameters: {
-                        type: 'object',
-                        properties: {
-                            name: { type: 'string', description: 'Nome dell\'Actor' },
-                            type: {
-                                type: 'string',
-                                enum: ['npc', 'character'],
-                                description: 'Tipo di Actor'
-                            },
-                            cr: { type: 'number', description: 'Challenge Rating (Grado Sfida)' },
-                            size: {
-                                type: 'string',
-                                enum: ['tiny', 'sm', 'med', 'lg', 'huge', 'grg'],
-                                description: 'Taglia della creatura'
-                            },
-                            creatureType: {
-                                type: 'string',
-                                description: 'Tipo di creatura (es: humanoid, undead, fiend)'
-                            },
-                            abilities: {
-                                type: 'object',
-                                properties: {
-                                    str: { type: 'number' },
-                                    dex: { type: 'number' },
-                                    con: { type: 'number' },
-                                    int: { type: 'number' },
-                                    wis: { type: 'number' },
-                                    cha: { type: 'number' }
-                                },
-                                description: 'Punteggi delle caratteristiche'
-                            },
-                            hp: {
-                                type: 'object',
-                                properties: {
-                                    value: { type: 'number' },
-                                    max: { type: 'number' },
-                                    formula: { type: 'string' }
-                                },
-                                description: 'Punti ferita'
-                            },
-                            ac: {
-                                type: 'object',
-                                properties: {
-                                    value: { type: 'number' },
-                                    formula: { type: 'string' }
-                                },
-                                description: 'Classe Armatura'
-                            },
-                            speed: {
-                                type: 'object',
-                                properties: {
-                                    walk: { type: 'number' },
-                                    fly: { type: 'number' },
-                                    swim: { type: 'number' },
-                                    climb: { type: 'number' },
-                                    burrow: { type: 'number' }
-                                },
-                                description: 'Velocità di movimento (in piedi)'
-                            },
-                            skills: {
-                                type: 'object',
-                                description: 'Abilità e relativi bonus'
-                            },
-                            senses: {
-                                type: 'object',
-                                properties: {
-                                    darkvision: { type: 'number' },
-                                    blindsight: { type: 'number' },
-                                    tremorsense: { type: 'number' },
-                                    truesight: { type: 'number' }
-                                },
-                                description: 'Sensi speciali (in piedi)'
-                            },
-                            languages: {
-                                type: 'array',
-                                items: { type: 'string' },
-                                description: 'Lingue parlate'
-                            },
-                            damageResistances: {
-                                type: 'array',
-                                items: { type: 'string' },
-                                description: 'Resistenze ai danni'
-                            },
-                            damageImmunities: {
-                                type: 'array',
-                                items: { type: 'string' },
-                                description: 'Immunità ai danni'
-                            },
-                            conditionImmunities: {
-                                type: 'array',
-                                items: { type: 'string' },
-                                description: 'Immunità alle condizioni'
-                            },
-                            biography: {
-                                type: 'string',
-                                description: 'Descrizione e background'
-                            },
-                            items: {
-                                type: 'array',
-                                items: {
-                                    type: 'object',
-                                    properties: {
-                                        type: {
-                                            type: 'string',
-                                            enum: ['weapon', 'feat', 'spell', 'equipment', 'consumable', 'tool', 'loot']
-                                        },
-                                        name: { type: 'string' },
-                                        fromCompendium: { type: 'string', description: 'UUID del compendio se esiste' },
-                                        custom: {
-                                            type: 'object',
-                                            description: 'Dati custom se creato da zero'
-                                        }
-                                    }
-                                },
-                                description: 'Items da aggiungere all\'Actor (armi, abilità, incantesimi)'
-                            }
-                        },
-                        required: ['name', 'type']
-                    }
-                }
-            },
-            {
-                type: 'function',
-                function: {
-                    name: 'modify_actor',
-                    description: 'Modifica un Actor esistente',
-                    parameters: {
-                        type: 'object',
-                        properties: {
-                            uuid: { type: 'string', description: 'UUID dell\'Actor da modificare' },
-                            changes: {
-                                type: 'object',
-                                description: 'Oggetto con le modifiche da applicare (stessa struttura di create_actor)'
-                            }
-                        },
-                        required: ['uuid', 'changes']
-                    }
-                }
-            },
-            {
-                type: 'function',
-                function: {
-                    name: 'create_item',
-                    description: 'Crea un nuovo Item (arma, oggetto, incantesimo, abilità)',
-                    parameters: {
-                        type: 'object',
-                        properties: {
-                            name: { type: 'string', description: 'Nome dell\'oggetto' },
-                            type: {
-                                type: 'string',
-                                enum: ['weapon', 'equipment', 'consumable', 'tool', 'loot', 'spell', 'feat', 'feature', 'class', 'subclass', 'background', 'race'],
-                                description: 'Tipo di Item'
-                            },
-                            targetActorUuid: {
-                                type: 'string',
-                                description: 'UUID dell\'Actor a cui aggiungere l\'item (opzionale, se non specificato crea item standalone)'
-                            },
-                            data: {
-                                type: 'object',
-                                description: 'Dati specifici dell\'item (dipende dal tipo)'
-                            }
-                        },
-                        required: ['name', 'type']
-                    }
-                }
-            },
-            {
-                type: 'function',
-                function: {
-                    name: 'get_actor_info',
-                    description: 'Ottieni informazioni dettagliate su un Actor specifico',
-                    parameters: {
-                        type: 'object',
-                        properties: {
-                            uuid: { type: 'string', description: 'UUID dell\'Actor' },
-                            name: { type: 'string', description: 'Nome dell\'Actor (se UUID non noto)' }
-                        }
-                    }
-                }
-            },
-            {
-                type: 'function',
-                function: {
-                    name: 'get_party_info',
-                    description: 'Ottieni informazioni dettagliate sul party dei giocatori',
-                    parameters: {
-                        type: 'object',
-                        properties: {}
-                    }
-                }
-            }
-        ];
-    }
-
-    /**
-     * Send a chat message to OpenRouter
+     * Send a chat message to OpenRouter (simple, no tools)
      * @param {Array} messages - Conversation messages
      * @param {Object} options - Additional options
      * @returns {Promise<Object>} API response
@@ -311,7 +123,6 @@ QUANDO DAI SOLO SUGGERIMENTI (senza creare):
 
         const isComplex = options.isComplex || false;
         const model = options.model || getModel(isComplex);
-        const useTools = options.useTools !== false;
 
         const requestBody = {
             model: model,
@@ -319,12 +130,6 @@ QUANDO DAI SOLO SUGGERIMENTI (senza creare):
             temperature: options.temperature || 0.7,
             max_tokens: options.maxTokens || 4096
         };
-
-        // Add tools for function calling if enabled
-        if (useTools) {
-            requestBody.tools = this.buildTools();
-            requestBody.tool_choice = 'auto';
-        }
 
         try {
             const response = await fetch(OPENROUTER_API_URL, {
@@ -416,21 +221,24 @@ QUANDO DAI SOLO SUGGERIMENTI (senza creare):
             /nemico/i,
             /personaggio/i,
             /actor/i,
-            /scheda/i
+            /scheda/i,
+            /goblin/i,
+            /orc/i,
+            /dragon/i
         ];
 
         return complexPatterns.some(pattern => pattern.test(message));
     }
 
     /**
-     * Parse the API response
+     * Parse the API response and extract any creation commands
      * @param {Object} response - Raw API response
-     * @returns {Object} Parsed response with content and tool calls
+     * @returns {Object} Parsed response with content and creation data
      */
     static parseResponse(response) {
         const result = {
             content: '',
-            toolCalls: [],
+            creationData: null,
             modelUsed: response.modelUsed,
             modelDisplayName: response.modelDisplayName,
             usage: response.usage
@@ -446,50 +254,25 @@ QUANDO DAI SOLO SUGGERIMENTI (senza creare):
         // Extract text content
         if (message.content) {
             result.content = message.content;
+
+            // Check for creation JSON block
+            const creationMatch = message.content.match(/---RYOMA_CREATE_START---\s*([\s\S]*?)\s*---RYOMA_CREATE_END---/);
+
+            if (creationMatch) {
+                try {
+                    result.creationData = JSON.parse(creationMatch[1].trim());
+                    // Remove the JSON block from displayed content
+                    result.content = message.content
+                        .replace(/---RYOMA_CREATE_START---[\s\S]*?---RYOMA_CREATE_END---/, '')
+                        .trim();
+                } catch (e) {
+                    console.warn(`${MODULE_ID} | Failed to parse creation JSON:`, e);
+                }
+            }
         }
 
-        // Extract tool calls
-        if (message.tool_calls && message.tool_calls.length > 0) {
-            result.toolCalls = message.tool_calls.map(tc => ({
-                id: tc.id,
-                name: tc.function.name,
-                arguments: JSON.parse(tc.function.arguments)
-            }));
-        }
-
-        // Check finish reason
         result.finishReason = choice.finish_reason;
-        result.needsConfirmation = result.toolCalls.some(tc =>
-            ['create_actor', 'modify_actor', 'create_item'].includes(tc.name)
-        );
 
         return result;
-    }
-
-    /**
-     * Continue conversation after tool execution
-     * @param {Array} messages - Previous messages
-     * @param {Array} toolResults - Results from tool executions
-     * @param {Object} context - Context object
-     * @returns {Promise<Object>} Continuation response
-     */
-    static async continueWithToolResults(messages, toolResults, context = {}) {
-        const updatedMessages = [...messages];
-
-        // Add tool results
-        for (const result of toolResults) {
-            updatedMessages.push({
-                role: 'tool',
-                tool_call_id: result.callId,
-                content: JSON.stringify(result.result)
-            });
-        }
-
-        const response = await this.chat(updatedMessages, {
-            isComplex: true,
-            useTools: true
-        });
-
-        return this.parseResponse(response);
     }
 }
