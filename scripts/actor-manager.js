@@ -271,11 +271,42 @@ export class ActorManager {
             case 'spell':
                 itemData.system.level = custom.level || 0;
                 itemData.system.school = custom.school || 'evo';
-                itemData.system.components = custom.components || { vocal: false, somatic: false, material: false };
+                itemData.system.components = custom.components || { vocal: true, somatic: true, material: false };
                 itemData.system.duration = custom.duration || { value: null, units: 'inst' };
-                itemData.system.range = custom.range || { value: null, units: 'self' };
-                itemData.system.damage = custom.damage || {};
-                itemData.system.save = custom.save || {};
+                itemData.system.range = custom.range || { value: 30, units: 'ft' };
+                itemData.system.actionType = custom.actionType || 'save';
+                itemData.system.activation = { type: 'action', cost: 1 };
+
+                // Handle damage - convert simple format to D&D 5e format
+                if (custom.damage) {
+                    if (typeof custom.damage === 'string') {
+                        // Simple format: "100d8"
+                        itemData.system.damage = {
+                            parts: [[custom.damage, custom.damageType || 'fire']]
+                        };
+                    } else if (Array.isArray(custom.damage?.parts)) {
+                        // Already in correct format
+                        itemData.system.damage = custom.damage;
+                    } else if (custom.damage.formula || custom.damage.dice) {
+                        // Object format: {formula: "100d8", type: "fire"}
+                        itemData.system.damage = {
+                            parts: [[custom.damage.formula || custom.damage.dice, custom.damage.type || custom.damageType || 'fire']]
+                        };
+                    } else {
+                        itemData.system.damage = { parts: [] };
+                    }
+                } else {
+                    itemData.system.damage = { parts: [] };
+                }
+
+                // Handle save
+                if (custom.save || custom.saveAbility) {
+                    itemData.system.save = {
+                        ability: custom.save?.ability || custom.saveAbility || 'dex',
+                        dc: custom.save?.dc || null,
+                        scaling: 'spell'
+                    };
+                }
                 break;
 
             case 'feat':
