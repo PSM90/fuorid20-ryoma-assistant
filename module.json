@@ -1,5 +1,5 @@
 {
-  "id": "fuori-d20-rioma",
+  "id": "fuori-d20-ryoma",
   "title": "Fuori D20: Ryoma Assistant",
   "description": "Assistente LLM intelligente per Master D&D 5e. Ryoma può conversare, consigliare, creare e modificare Actors e Items.",
   "version": "1.0.0",
@@ -33,16 +33,11 @@
     {
       "lang": "it",
       "name": "Italiano",
-      "path": "lang/it.json",
-      "flags": {}
+      "path": "lang/it.json"
     }
   ],
   "socket": true,
-  "url": "",
-  "manifest": "",
-  "download": "",
-  "license": "MIT",
-  "readme": "",
-  "bugs": "",
-  "changelog": ""
+  "url": "https://github.com/PSM90/fuorid20-ryoma-assistant",
+  "manifest": "https://raw.githubusercontent.com/PSM90/fuorid20-ryoma-assistant/main/module.json",
+  "download": "https://github.com/PSM90/fuorid20-ryoma-assistant/archive/refs/heads/main.zip"
 }
