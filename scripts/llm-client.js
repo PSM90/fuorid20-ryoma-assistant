@@ -63,16 +63,16 @@ STRUTTURA DATI PER ACTOR (NPC/Mostro):
     "senses": {"darkvision": 60},
     "biography": "Descrizione...",
     "items": [
-      {"type": "spell", "name": "Misty Step", "fromCompendium": true},
+      {"type": "spell", "name": "Passo velato", "fromCompendium": true},
       {"type": "spell", "name": "Testfuoco", "custom": {"level": 1, "damage": "100d8", "damageType": "fire", "description": "Un incantesimo devastante di fuoco."}}
     ]
   }
 }
 
 IMPORTANTE PER GLI ITEMS:
-- Se l'item esiste nei compendi (es: "Misty Step", "Fireball", "Longsword"), usa: {"type": "spell", "name": "Misty Step", "fromCompendium": true}
+- Se l'item esiste nei compendi (es: "Passo velato", "Palla di fuoco", "Spada lunga"), usa: {"type": "spell", "name": "Passo velato", "fromCompendium": true}
 - Se l'item è CUSTOM/inventato (es: "Testfuoco"), usa: {"type": "spell", "name": "Testfuoco", "custom": {...dati...}}
-- USA SEMPRE IL NOME INGLESE ORIGINALE per gli item dai compendi (es: "Misty Step" non "Passo velato")
+- USA IL NOME ESATTO come appare nei compendi del Master (tipicamente in italiano per compendi italiani)
 
 STRUTTURA DATI PER ITEM:
 {
