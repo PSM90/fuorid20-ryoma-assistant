@@ -4,7 +4,7 @@
  */
 
 // Module constants
-export const MODULE_ID = 'fuori-d20-ryoma';
+export const MODULE_ID = 'fuorid20-ryoma-assistant';
 export const MODULE_NAME = 'Fuori D20: Ryoma Assistant';
 
 // OpenRouter API endpoint
