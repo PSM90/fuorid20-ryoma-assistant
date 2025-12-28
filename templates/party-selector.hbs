@@ -1,0 +1,104 @@
+<form class="rioma-party-selector">
+  <div class="search-container">
+    <input type="text" 
+           class="search-input" 
+           placeholder="{{localize 'RIOMA.Party.Search'}}" 
+           data-action="search">
+  </div>
+
+  <div class="actors-container">
+    <div class="actors-list selected-list">
+      <h3>
+        <i class="fas fa-users"></i>
+        {{localize "RIOMA.Party.Selected"}} 
+        <span class="count">({{selectedCount}})</span>
+      </h3>
+      <div class="actor-items" data-list="selected">
+        {{#each actors}}
+          {{#if this.selected}}
+          <div class="actor-item selected" data-uuid="{{this.uuid}}">
+            <input type="checkbox" 
+                   name="selectedActors" 
+                   value="{{this.uuid}}" 
+                   checked>
+            <img class="actor-img" src="{{this.img}}" alt="{{this.name}}">
+            <div class="actor-info">
+              <div class="actor-name">{{this.name}}</div>
+              <div class="actor-details">
+                {{#if this.class}}{{this.class}}{{/if}}
+                {{#if this.level}}Lv{{this.level}}{{/if}}
+              </div>
+            </div>
+          </div>
+          {{/if}}
+        {{/each}}
+      </div>
+    </div>
+
+    <div class="actors-list available-list">
+      <h3>
+        <i class="fas fa-user"></i>
+        {{localize "RIOMA.Party.Available"}}
+      </h3>
+      <div class="actor-items" data-list="available">
+        {{#each actors}}
+          {{#unless this.selected}}
+          <div class="actor-item" data-uuid="{{this.uuid}}">
+            <input type="checkbox" 
+                   name="selectedActors" 
+                   value="{{this.uuid}}">
+            <img class="actor-img" src="{{this.img}}" alt="{{this.name}}">
+            <div class="actor-info">
+              <div class="actor-name">{{this.name}}</div>
+              <div class="actor-details">
+                {{#if this.class}}{{this.class}}{{/if}}
+                {{#if this.level}}Lv{{this.level}}{{/if}}
+              </div>
+            </div>
+          </div>
+          {{/unless}}
+        {{/each}}
+      </div>
+    </div>
+  </div>
+
+  <footer class="sheet-footer flexrow">
+    <button type="submit" name="submit">
+      <i class="fas fa-save"></i>
+      {{localize "RIOMA.Party.Save"}}
+    </button>
+    <button type="button" class="cancel" data-action="close">
+      <i class="fas fa-times"></i>
+      {{localize "RIOMA.Party.Cancel"}}
+    </button>
+  </footer>
+</form>
+
+<script>
+  // Search functionality
+  document.querySelector('[data-action="search"]')?.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase();
+    document.querySelectorAll('.actor-item').forEach(item => {
+      const name = item.querySelector('.actor-name').textContent.toLowerCase();
+      item.style.display = name.includes(query) ? '' : 'none';
+    });
+  });
+
+  // Toggle actor selection
+  document.querySelectorAll('.actor-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      if (e.target.type === 'checkbox') return;
+      const checkbox = item.querySelector('input[type="checkbox"]');
+      checkbox.checked = !checkbox.checked;
+      item.classList.toggle('selected', checkbox.checked);
+    });
+  });
+
+  // Cancel button
+  document.querySelector('[data-action="close"]')?.addEventListener('click', () => {
+    const app = ui.windows[Object.keys(ui.windows).find(k => 
+      ui.windows[k].options?.id === 'rioma-party-selector'
+    )];
+    if (app) app.close();
+  });
+</script>

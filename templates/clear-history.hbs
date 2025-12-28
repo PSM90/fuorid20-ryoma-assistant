@@ -1,0 +1,65 @@
+<form class="rioma-clear-history">
+    <div class="warning-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+    </div>
+
+    <div class="warning-message">
+        <p>{{message}}</p>
+        <p class="warning-details">
+            Questa azione cancellerà tutte le conversazioni salvate con Ryoma in questo World.
+            L'operazione non può essere annullata.
+        </p>
+    </div>
+
+    <footer class="sheet-footer flexrow">
+        <button type="submit" name="submit" class="danger">
+            <i class="fas fa-trash"></i>
+            Cancella Storico
+        </button>
+        <button type="button" class="cancel" data-action="close">
+            <i class="fas fa-times"></i>
+            Annulla
+        </button>
+    </footer>
+</form>
+
+<style>
+    .rioma-clear-history {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .rioma-clear-history .warning-icon {
+        font-size: 48px;
+        color: #ff6b6b;
+        margin-bottom: 15px;
+    }
+
+    .rioma-clear-history .warning-message {
+        margin-bottom: 20px;
+    }
+
+    .rioma-clear-history .warning-details {
+        font-size: 0.9em;
+        color: var(--rioma-text-muted);
+    }
+
+    .rioma-clear-history button.danger {
+        background: #ff6b6b;
+        color: white;
+    }
+
+    .rioma-clear-history button.danger:hover {
+        background: #ff5252;
+    }
+</style>
+
+<script>
+    // Cancel button
+    document.querySelector('[data-action="close"]')?.addEventListener('click', () => {
+        const app = ui.windows[Object.keys(ui.windows).find(k =>
+            ui.windows[k].options?.id === 'rioma-clear-history'
+        )];
+        if (app) app.close();
+    });
+</script>

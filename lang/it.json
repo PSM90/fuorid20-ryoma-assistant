@@ -1,0 +1,101 @@
+{
+    "RYOMA": {
+        "Title": "Fuori D20: Ryoma Assistant",
+        "Settings": {
+            "ApiKey": {
+                "Name": "API Key OpenRouter",
+                "Hint": "Inserisci la tua API key da openrouter.ai"
+            },
+            "DefaultModel": {
+                "Name": "Modello Conversazione",
+                "Hint": "Modello LLM per conversazioni normali (default: GPT-4o-mini)"
+            },
+            "ComplexModel": {
+                "Name": "Modello Creazione Complessa",
+                "Hint": "Modello LLM per creazioni Actor/Item (default: Claude 3.5 Sonnet)"
+            },
+            "PartyConfig": {
+                "Name": "Configura Party",
+                "Hint": "Seleziona gli Actors che sono PG giocanti",
+                "Button": "Configura Party"
+            },
+            "CompendiumConfig": {
+                "Name": "Configura Compendi",
+                "Hint": "Seleziona i compendi per ogni categoria",
+                "Button": "Configura Compendi"
+            },
+            "ClearHistory": {
+                "Name": "Cancella Storico",
+                "Hint": "Cancella tutte le conversazioni salvate con Ryoma",
+                "Button": "Cancella Storico",
+                "Confirm": "Sei sicuro di voler cancellare tutto lo storico delle conversazioni con Ryoma?"
+            }
+        },
+        "Categories": {
+            "classes": "Classi",
+            "subclasses": "Sottoclassi",
+            "features": "Abilità e Razziali",
+            "spells": "Incantesimi",
+            "items": "Oggetti",
+            "actors": "Actors (Mostri/NPC)",
+            "races": "Razze",
+            "proficiencies": "Competenze e Maestrie"
+        },
+        "Chat": {
+            "Thinking": "Ryoma sta pensando...",
+            "Error": "Ryoma ha incontrato un errore: {error}",
+            "NoPermission": "Solo il Master o l'Aiuto Master possono parlare con Ryoma.",
+            "NoApiKey": "API Key non configurata. Vai nelle impostazioni del modulo.",
+            "Prefix": "!R"
+        },
+        "Confirmation": {
+            "Title": "Ryoma vuole creare",
+            "TitleModify": "Ryoma vuole modificare",
+            "Confirm": "Conferma",
+            "Cancel": "Annulla",
+            "Type": "Tipo",
+            "Name": "Nome",
+            "Level": "Livello",
+            "CR": "Grado Sfida",
+            "Stats": "Statistiche",
+            "Items": "Oggetti",
+            "Features": "Abilità",
+            "Spells": "Incantesimi",
+            "FromCompendium": "dal compendio",
+            "Custom": "creato"
+        },
+        "Party": {
+            "Title": "Configura Party - PG Giocanti",
+            "Search": "Cerca Actor...",
+            "NoActors": "Nessun Actor trovato",
+            "Selected": "Selezionati",
+            "Available": "Disponibili",
+            "Save": "Salva",
+            "Cancel": "Annulla"
+        },
+        "Compendium": {
+            "Title": "Configura Compendi",
+            "SelectCategory": "Seleziona Categoria",
+            "AvailableCompendiums": "Compendi Disponibili",
+            "SelectedCompendiums": "Compendi Selezionati",
+            "NoCompendiums": "Nessun compendio disponibile per questa categoria",
+            "Save": "Salva",
+            "Cancel": "Annulla"
+        },
+        "Actions": {
+            "CreateActor": "Creazione Actor",
+            "ModifyActor": "Modifica Actor",
+            "CreateItem": "Creazione Oggetto",
+            "ModifyItem": "Modifica Oggetto",
+            "Suggestion": "Suggerimento",
+            "Success": "Operazione completata con successo!",
+            "Cancelled": "Operazione annullata."
+        },
+        "Models": {
+            "gpt4omini": "GPT-4o Mini (Economico)",
+            "claude35sonnet": "Claude 3.5 Sonnet (Avanzato)",
+            "gpt4o": "GPT-4o",
+            "claude3haiku": "Claude 3 Haiku (Economico)"
+        }
+    }
+}

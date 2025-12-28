@@ -1,0 +1,62 @@
+<div class="rioma-confirmation-dialog">
+    <div class="recap-header">
+        <div class="rioma-avatar">🐺</div>
+        <h2>{{#if isModify}}{{localize "RIOMA.Confirmation.TitleModify"}}{{else}}{{localize
+            "RIOMA.Confirmation.Title"}}{{/if}}</h2>
+    </div>
+
+    <div class="recap-body">
+        {{#if recap}}
+        <div class="recap-section">
+            <h4>{{localize "RIOMA.Confirmation.Type"}}</h4>
+            <div class="recap-item">
+                <span class="recap-value">{{recap.type}} - {{recap.subtype}}</span>
+            </div>
+        </div>
+
+        <div class="recap-section">
+            <h4>{{localize "RIOMA.Confirmation.Name"}}</h4>
+            <div class="recap-item">
+                <span class="recap-value">{{recap.name}}</span>
+            </div>
+        </div>
+
+        {{#if recap.details.length}}
+        <div class="recap-section">
+            <h4>{{localize "RIOMA.Confirmation.Stats"}}</h4>
+            {{#each recap.details}}
+            <div class="recap-item">
+                <span class="recap-label">{{this.label}}:</span>
+                <span class="recap-value">{{this.value}}</span>
+            </div>
+            {{/each}}
+        </div>
+        {{/if}}
+
+        {{#if recap.items}}
+        <div class="recap-section">
+            <h4>{{localize "RIOMA.Confirmation.Items"}}</h4>
+            {{#each recap.items}}
+            <div class="recap-item">
+                <span class="recap-value {{#if this.fromCompendium}}from-compendium{{else}}custom{{/if}}">
+                    {{#if this.fromCompendium}}📚{{else}}✨{{/if}}
+                    {{this}}
+                </span>
+            </div>
+            {{/each}}
+        </div>
+        {{/if}}
+        {{/if}}
+    </div>
+
+    <div class="dialog-buttons">
+        <button type="button" class="confirm" data-action="confirm">
+            <i class="fas fa-check"></i>
+            {{localize "RIOMA.Confirmation.Confirm"}}
+        </button>
+        <button type="button" class="cancel" data-action="cancel">
+            <i class="fas fa-times"></i>
+            {{localize "RIOMA.Confirmation.Cancel"}}
+        </button>
+    </div>
+</div>

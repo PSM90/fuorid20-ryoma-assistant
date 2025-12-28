@@ -1,0 +1,110 @@
+<form class="rioma-compendium-config">
+    <div class="tabs-container">
+        {{#each categories}}
+        <button type="button" class="tab-button {{#if @first}}active{{/if}}" data-tab="{{@key}}">
+            {{this.name}}
+            <span class="count">{{this.selectedCount}}</span>
+        </button>
+        {{/each}}
+    </div>
+
+    <div class="tab-content">
+        {{#each categories}}
+        <div class="tab-pane {{#if @first}}active{{/if}}" data-tab="{{@key}}">
+            <div class="compendiums-container">
+                {{#if this.compendiums.length}}
+                {{#each this.compendiums}}
+                <div class="compendium-item {{#if this.selected}}selected{{/if}}">
+                    <input type="checkbox" name="compendiums.{{@../key}}" value="{{this.id}}" {{#if
+                        this.selected}}checked{{/if}}>
+                    <div class="compendium-info">
+                        <div class="compendium-name">{{this.name}}</div>
+                        <div class="compendium-pack">{{this.package}}</div>
+                    </div>
+                    <span class="compendium-count">{{this.count}} elementi</span>
+                </div>
+                {{/each}}
+                {{else}}
+                <div class="no-compendiums">
+                    <i class="fas fa-book-open"></i>
+                    <p>{{localize "RIOMA.Compendium.NoCompendiums"}}</p>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+        {{/each}}
+    </div>
+
+    <footer class="sheet-footer flexrow">
+        <button type="submit" name="submit">
+            <i class="fas fa-save"></i>
+            {{localize "RIOMA.Compendium.Save"}}
+        </button>
+        <button type="button" class="cancel" data-action="close">
+            <i class="fas fa-times"></i>
+            {{localize "RIOMA.Compendium.Cancel"}}
+        </button>
+    </footer>
+</form>
+
+<style>
+    .rioma-compendium-config .tab-content .tab-pane {
+        display: none;
+    }
+
+    .rioma-compendium-config .tab-content .tab-pane.active {
+        display: block;
+    }
+
+    .rioma-compendium-config .no-compendiums {
+        text-align: center;
+        padding: 40px;
+        color: var(--rioma-text-muted);
+    }
+
+    .rioma-compendium-config .no-compendiums i {
+        font-size: 48px;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+</style>
+
+<script>
+    // Tab switching
+    document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const tabId = btn.dataset.tab;
+
+            // Update buttons
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Update panes
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            document.querySelector(`.tab-pane[data-tab="${tabId}"]`)?.classList.add('active');
+        });
+    });
+
+    // Compendium item click
+    document.querySelectorAll('.compendium-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            if (e.target.type === 'checkbox') return;
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            item.classList.toggle('selected', checkbox.checked);
+
+            // Update count in tab
+            const tabId = item.closest('.tab-pane').dataset.tab;
+            const count = item.closest('.tab-pane').querySelectorAll('input:checked').length;
+            document.querySelector(`.tab-button[data-tab="${tabId}"] .count`).textContent = count;
+        });
+    });
+
+    // Cancel button
+    document.querySelector('[data-action="close"]')?.addEventListener('click', () => {
+        const app = ui.windows[Object.keys(ui.windows).find(k =>
+            ui.windows[k].options?.id === 'rioma-compendium-config'
+        )];
+        if (app) app.close();
+    });
+</script>

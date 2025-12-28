@@ -1,0 +1,531 @@
+/* ================================================
+   Fuori D20: Ryoma Assistant - Styles
+   ================================================ */
+
+:root {
+  --rioma-primary: #e94560;
+  --rioma-secondary: #1a1a2e;
+  --rioma-tertiary: #16213e;
+  --rioma-accent: #0f3460;
+  --rioma-text: #eaeaea;
+  --rioma-text-muted: #a0a0a0;
+  --rioma-success: #4ecca3;
+  --rioma-warning: #ffc107;
+  --rioma-error: #ff6b6b;
+  --rioma-border-radius: 8px;
+  --rioma-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* ================================================
+   Chat Messages
+   ================================================ */
+
+.rioma-chat-message {
+  background: linear-gradient(135deg, var(--rioma-secondary), var(--rioma-tertiary));
+  border-left: 4px solid var(--rioma-primary);
+  border-radius: var(--rioma-border-radius);
+  padding: 12px 16px;
+  margin: 8px 0;
+  box-shadow: var(--rioma-shadow);
+  color: var(--rioma-text);
+}
+
+.rioma-chat-message .rioma-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rioma-chat-message .rioma-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--rioma-primary), #ff6b6b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.rioma-chat-message .rioma-name,
+.rioma-chat-message .ryoma-name {
+  font-weight: bold;
+  font-size: 1.1em;
+  color: var(--rioma-primary);
+}
+
+.rioma-chat-message .rioma-model {
+  font-size: 0.75em;
+  color: var(--rioma-text-muted);
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.rioma-chat-message .rioma-content {
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.rioma-chat-message .rioma-content p {
+  margin: 0 0 8px 0;
+}
+
+.rioma-chat-message .rioma-content p:last-child {
+  margin-bottom: 0;
+}
+
+.rioma-chat-message .rioma-content code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.rioma-chat-message .rioma-content ul,
+.rioma-chat-message .rioma-content ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.rioma-chat-message .rioma-content li {
+  margin: 4px 0;
+}
+
+/* Thinking indicator */
+.rioma-thinking {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--rioma-text-muted);
+  font-style: italic;
+}
+
+.rioma-thinking .dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.rioma-thinking .dot {
+  width: 6px;
+  height: 6px;
+  background: var(--rioma-primary);
+  border-radius: 50%;
+  animation: rioma-bounce 1.4s infinite ease-in-out both;
+}
+
+.rioma-thinking .dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.rioma-thinking .dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+.rioma-thinking .dot:nth-child(3) {
+  animation-delay: 0s;
+}
+
+@keyframes rioma-bounce {
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+  }
+
+  40% {
+    transform: scale(1);
+  }
+}
+
+/* Error message */
+.rioma-error {
+  background: linear-gradient(135deg, #2d1f1f, #3d2020);
+  border-left-color: var(--rioma-error);
+}
+
+/* ================================================
+   Confirmation Dialog
+   ================================================ */
+
+.rioma-confirmation-dialog {
+  background: var(--rioma-secondary);
+  color: var(--rioma-text);
+  border-radius: var(--rioma-border-radius);
+}
+
+.rioma-confirmation-dialog .window-header {
+  background: linear-gradient(135deg, var(--rioma-tertiary), var(--rioma-accent));
+  border-bottom: 2px solid var(--rioma-primary);
+}
+
+.rioma-confirmation-dialog .window-content {
+  padding: 20px;
+}
+
+.rioma-confirmation-dialog .recap-section {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--rioma-border-radius);
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.rioma-confirmation-dialog .recap-section h4 {
+  color: var(--rioma-primary);
+  margin: 0 0 10px 0;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.rioma-confirmation-dialog .recap-item {
+  display: flex;
+  gap: 10px;
+  margin: 8px 0;
+  align-items: flex-start;
+}
+
+.rioma-confirmation-dialog .recap-label {
+  color: var(--rioma-text-muted);
+  min-width: 100px;
+}
+
+.rioma-confirmation-dialog .recap-value {
+  color: var(--rioma-text);
+  flex: 1;
+}
+
+.rioma-confirmation-dialog .recap-value.from-compendium {
+  color: var(--rioma-success);
+}
+
+.rioma-confirmation-dialog .recap-value.custom {
+  color: var(--rioma-warning);
+}
+
+.rioma-confirmation-dialog .dialog-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.rioma-confirmation-dialog button {
+  padding: 10px 24px;
+  border-radius: var(--rioma-border-radius);
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rioma-confirmation-dialog button.confirm {
+  background: var(--rioma-success);
+  color: var(--rioma-secondary);
+}
+
+.rioma-confirmation-dialog button.confirm:hover {
+  background: #3db892;
+  transform: translateY(-2px);
+}
+
+.rioma-confirmation-dialog button.cancel {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--rioma-text);
+}
+
+.rioma-confirmation-dialog button.cancel:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ================================================
+   Settings UI
+   ================================================ */
+
+.rioma-settings-app {
+  background: var(--rioma-secondary);
+  color: var(--rioma-text);
+}
+
+.rioma-settings-app .window-header {
+  background: linear-gradient(135deg, var(--rioma-tertiary), var(--rioma-accent));
+}
+
+.rioma-settings-app .form-group {
+  margin-bottom: 15px;
+}
+
+.rioma-settings-app label {
+  color: var(--rioma-text);
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.rioma-settings-app input[type="text"],
+.rioma-settings-app input[type="password"],
+.rioma-settings-app select {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--rioma-border-radius);
+  color: var(--rioma-text);
+  padding: 8px 12px;
+  width: 100%;
+}
+
+.rioma-settings-app input:focus,
+.rioma-settings-app select:focus {
+  border-color: var(--rioma-primary);
+  outline: none;
+}
+
+.rioma-settings-app .hint {
+  font-size: 0.85em;
+  color: var(--rioma-text-muted);
+  margin-top: 4px;
+}
+
+/* ================================================
+   Party Selector
+   ================================================ */
+
+.rioma-party-selector {
+  background: var(--rioma-secondary);
+  color: var(--rioma-text);
+  min-width: 500px;
+}
+
+.rioma-party-selector .search-container {
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.rioma-party-selector .search-input {
+  width: 100%;
+  padding: 10px 15px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  color: var(--rioma-text);
+  font-size: 1em;
+}
+
+.rioma-party-selector .search-input:focus {
+  border-color: var(--rioma-primary);
+  outline: none;
+}
+
+.rioma-party-selector .search-input::placeholder {
+  color: var(--rioma-text-muted);
+}
+
+.rioma-party-selector .actors-container {
+  display: flex;
+  gap: 20px;
+  padding: 15px;
+  max-height: 400px;
+}
+
+.rioma-party-selector .actors-list {
+  flex: 1;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--rioma-border-radius);
+  padding: 10px;
+}
+
+.rioma-party-selector .actors-list h3 {
+  color: var(--rioma-primary);
+  margin: 0 0 10px 0;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rioma-party-selector .actor-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  margin: 5px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--rioma-border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rioma-party-selector .actor-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
+}
+
+.rioma-party-selector .actor-item.selected {
+  background: rgba(233, 69, 96, 0.2);
+  border-left: 3px solid var(--rioma-primary);
+}
+
+.rioma-party-selector .actor-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.rioma-party-selector .actor-info {
+  flex: 1;
+}
+
+.rioma-party-selector .actor-name {
+  font-weight: bold;
+  color: var(--rioma-text);
+}
+
+.rioma-party-selector .actor-details {
+  font-size: 0.8em;
+  color: var(--rioma-text-muted);
+}
+
+/* ================================================
+   Compendium Config
+   ================================================ */
+
+.rioma-compendium-config {
+  background: var(--rioma-secondary);
+  color: var(--rioma-text);
+  min-width: 600px;
+}
+
+.rioma-compendium-config .tabs-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rioma-compendium-config .tab-button {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  color: var(--rioma-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9em;
+}
+
+.rioma-compendium-config .tab-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--rioma-text);
+}
+
+.rioma-compendium-config .tab-button.active {
+  background: var(--rioma-primary);
+  border-color: var(--rioma-primary);
+  color: white;
+}
+
+.rioma-compendium-config .tab-button .count {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 5px;
+  font-size: 0.85em;
+}
+
+.rioma-compendium-config .compendiums-container {
+  padding: 15px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.rioma-compendium-config .compendium-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  margin: 5px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--rioma-border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rioma-compendium-config .compendium-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.rioma-compendium-config .compendium-item.selected {
+  background: rgba(78, 204, 163, 0.2);
+  border-left: 3px solid var(--rioma-success);
+}
+
+.rioma-compendium-config .compendium-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--rioma-success);
+}
+
+.rioma-compendium-config .compendium-info {
+  flex: 1;
+}
+
+.rioma-compendium-config .compendium-name {
+  font-weight: bold;
+  color: var(--rioma-text);
+}
+
+.rioma-compendium-config .compendium-pack {
+  font-size: 0.8em;
+  color: var(--rioma-text-muted);
+}
+
+.rioma-compendium-config .compendium-count {
+  font-size: 0.85em;
+  color: var(--rioma-text-muted);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 4px 10px;
+  border-radius: 10px;
+}
+
+/* ================================================
+   Scrollbar Styling
+   ================================================ */
+
+.rioma-party-selector ::-webkit-scrollbar,
+.rioma-compendium-config ::-webkit-scrollbar,
+.rioma-confirmation-dialog ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.rioma-party-selector ::-webkit-scrollbar-track,
+.rioma-compendium-config ::-webkit-scrollbar-track,
+.rioma-confirmation-dialog ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.rioma-party-selector ::-webkit-scrollbar-thumb,
+.rioma-compendium-config ::-webkit-scrollbar-thumb,
+.rioma-confirmation-dialog ::-webkit-scrollbar-thumb {
+  background: var(--rioma-primary);
+  border-radius: 4px;
+}
+
+.rioma-party-selector ::-webkit-scrollbar-thumb:hover,
+.rioma-compendium-config ::-webkit-scrollbar-thumb:hover,
+.rioma-confirmation-dialog ::-webkit-scrollbar-thumb:hover {
+  background: #ff6b6b;
+}
