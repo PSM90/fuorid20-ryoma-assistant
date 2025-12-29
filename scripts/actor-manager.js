@@ -246,26 +246,74 @@ export class ActorManager {
      * @returns {Object} Foundry item data
      */
     static buildItemData(data) {
+        const custom = data.custom || data;
+
         const itemData = {
             name: data.name || 'Nuovo Item',
             type: data.type || 'feat',
             img: data.img || this.getDefaultItemIcon(data.type),
             system: {
                 description: {
-                    value: data.description || data.custom?.description || ''
+                    value: custom.description || data.description || ''
                 }
             }
         };
 
-        // Add type-specific data
-        const custom = data.custom || data;
+        // Convert damage array to D&D 5e parts format
+        const buildDamageParts = (damageInput) => {
+            if (!damageInput) return { parts: [] };
+
+            // Array format: [{"formula": "2d8", "type": "slashing"}, ...]
+            if (Array.isArray(damageInput)) {
+                const parts = damageInput.map(d => [d.formula || d.dice || '1d6', d.type || 'bludgeoning']);
+                return { parts };
+            }
+
+            // String format: "2d8"
+            if (typeof damageInput === 'string') {
+                return { parts: [[damageInput, custom.damageType || 'bludgeoning']] };
+            }
+
+            // Already in correct format
+            if (damageInput.parts) {
+                return damageInput;
+            }
+
+            return { parts: [] };
+        };
+
+        // Build save data
+        const buildSaveData = (saveInput) => {
+            if (!saveInput) return null;
+            return {
+                ability: saveInput.ability || 'con',
+                dc: saveInput.dc || null,
+                scaling: saveInput.scaling || 'flat'
+            };
+        };
 
         switch (data.type) {
             case 'weapon':
-                itemData.system.damage = custom.damage || { parts: [['1d6', 'slashing']] };
-                itemData.system.range = custom.range || { value: null, long: null, units: 'ft' };
-                itemData.system.properties = custom.properties || {};
                 itemData.system.actionType = custom.actionType || 'mwak';
+                itemData.system.damage = buildDamageParts(custom.damage);
+                itemData.system.activation = { type: 'action', cost: 1 };
+                itemData.system.range = custom.range || { value: 5, units: 'ft' };
+
+                // Handle weapon properties as array or object
+                if (Array.isArray(custom.properties)) {
+                    itemData.system.properties = {};
+                    custom.properties.forEach(p => itemData.system.properties[p] = true);
+                } else {
+                    itemData.system.properties = custom.properties || {};
+                }
+
+                // Handle save for weapons
+                if (custom.save) {
+                    itemData.system.save = buildSaveData(custom.save);
+                    if (!itemData.system.actionType.includes('save')) {
+                        itemData.system.actionType = 'save';
+                    }
+                }
                 break;
 
             case 'spell':
@@ -276,45 +324,32 @@ export class ActorManager {
                 itemData.system.range = custom.range || { value: 30, units: 'ft' };
                 itemData.system.actionType = custom.actionType || 'save';
                 itemData.system.activation = { type: 'action', cost: 1 };
+                itemData.system.damage = buildDamageParts(custom.damage);
 
-                // Handle damage - convert simple format to D&D 5e format
-                if (custom.damage) {
-                    if (typeof custom.damage === 'string') {
-                        // Simple format: "100d8"
-                        itemData.system.damage = {
-                            parts: [[custom.damage, custom.damageType || 'fire']]
-                        };
-                    } else if (Array.isArray(custom.damage?.parts)) {
-                        // Already in correct format
-                        itemData.system.damage = custom.damage;
-                    } else if (custom.damage.formula || custom.damage.dice) {
-                        // Object format: {formula: "100d8", type: "fire"}
-                        itemData.system.damage = {
-                            parts: [[custom.damage.formula || custom.damage.dice, custom.damage.type || custom.damageType || 'fire']]
-                        };
-                    } else {
-                        itemData.system.damage = { parts: [] };
-                    }
-                } else {
-                    itemData.system.damage = { parts: [] };
+                // Handle target
+                if (custom.target) {
+                    itemData.system.target = {
+                        value: custom.target.value || null,
+                        units: custom.target.units || 'ft',
+                        type: custom.target.type || ''
+                    };
                 }
 
                 // Handle save
-                if (custom.save || custom.saveAbility) {
-                    itemData.system.save = {
-                        ability: custom.save?.ability || custom.saveAbility || 'dex',
-                        dc: custom.save?.dc || null,
-                        scaling: 'spell'
-                    };
+                if (custom.save) {
+                    itemData.system.save = buildSaveData(custom.save);
                 }
                 break;
 
             case 'feat':
             case 'feature':
-                itemData.system.activation = custom.activation || { type: '', cost: null };
+                itemData.system.activation = custom.activation || { type: 'action', cost: 1 };
                 itemData.system.uses = custom.uses || { value: null, max: '', per: '' };
-                itemData.system.damage = custom.damage || {};
-                itemData.system.save = custom.save || {};
+                itemData.system.damage = buildDamageParts(custom.damage);
+                if (custom.save) {
+                    itemData.system.save = buildSaveData(custom.save);
+                }
+                itemData.system.actionType = custom.actionType || '';
                 break;
 
             case 'equipment':
@@ -324,6 +359,7 @@ export class ActorManager {
             case 'consumable':
                 itemData.system.consumableType = custom.consumableType || 'potion';
                 itemData.system.uses = custom.uses || { value: 1, max: 1, per: 'charges', autoDestroy: true };
+                itemData.system.damage = buildDamageParts(custom.damage);
                 break;
         }
 
