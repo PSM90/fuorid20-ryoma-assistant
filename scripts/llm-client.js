@@ -94,8 +94,19 @@ Rispondi con un recap in italiano e poi un blocco JSON speciale con i marcatori:
       {"type": "spell", "name": "Passo velato", "fromCompendium": true},
       {"type": "weapon", "name": "Arco corto", "fromCompendium": true},
       {"type": "weapon", "name": "Lama Infuocata", "custom": {
+        "description": "Una lama avvolta dal fuoco",
         "damage": [{"formula": "1d6", "type": "slashing"}, {"formula": "1d6", "type": "fire"}],
-        "actionType": "mwak"
+        "actionType": "mwak",
+        "save": {"ability": "con", "dc": 12, "effect": "prono"}
+      }},
+      {"type": "spell", "name": "Fiamma Maledetta", "custom": {
+        "description": "Un incantesimo oscuro che brucia l'anima",
+        "level": 2,
+        "school": "nec",
+        "damage": [{"formula": "3d8", "type": "fire"}, {"formula": "2d6", "type": "necrotic"}],
+        "actionType": "save",
+        "save": {"ability": "dex", "effect": "half"},
+        "range": {"value": 60, "units": "ft"}
       }}
     ]
   }
@@ -108,7 +119,7 @@ ACTION TYPES: mwak (mischia arma), rwak (distanza arma), msak (mischia incantesi
 SCUOLE MAGIA: abj, con, div, enc, evo, ill, nec, trs
 
 PER ITEMS DAI COMPENDI: usa {"name": "Nome esatto", "fromCompendium": true}
-PER ITEMS CUSTOM: usa {"name": "Nome", "custom": {...dati...}}`;
+PER ITEMS CUSTOM: usa {"name": "Nome", "custom": {...tutti i dati...}}`;
 
         // Add party context
         if (context.party && context.party.length > 0) {
